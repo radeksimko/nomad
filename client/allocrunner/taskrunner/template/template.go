@@ -808,13 +808,18 @@ func newRunnerConfig(config *TaskTemplateManagerConfig,
 
 	// Set up the Consul config
 	if cc.ConsulConfig != nil {
-		conf.Consul.Address = &cc.ConsulConfig.Addr
-		conf.Consul.Token = &cc.ConsulConfig.Token
+		consul, err := cc.ConsulConfig.ApiConfig()
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize Consul client config: %v", err)
+		}
+
+		conf.Consul.Address = &consul.Address
+		conf.Consul.Token = &consul.Token
 
 		// Get the Consul namespace from agent config. This is the lower level
 		// of precedence (beyond default).
-		if cc.ConsulConfig.Namespace != "" {
-			conf.Consul.Namespace = &cc.ConsulConfig.Namespace
+		if consul.Namespace != "" {
+			conf.Consul.Namespace = &consul.Namespace
 		}
 
 		if cc.ConsulConfig.EnableSSL != nil && *cc.ConsulConfig.EnableSSL {
