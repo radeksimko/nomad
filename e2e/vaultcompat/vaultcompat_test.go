@@ -327,6 +327,10 @@ func downloadVaultBuild(t *testing.T, b build) {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
+	cmdV := exec.CommandContext(ctx, "hc-install", "-version")
+	out, err := cmdV.CombinedOutput()
+	t.Logf("hc-install %s", string(out))
+
 	cmd := exec.CommandContext(ctx, "hc-install", "install", "-version", b.Version, "-path", path, "vault")
 	bs, err := cmd.CombinedOutput()
 	must.NoError(t, err, must.Sprintf("failed to download vault %s: %s", b.Version, string(bs)))
